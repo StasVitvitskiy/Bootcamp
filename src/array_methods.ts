@@ -34,9 +34,77 @@ export function of(...args) {
     }
     return newArr;
 }
-export function concat(...args) {
+export function concat(array,...args) {
     const newArr = [];
-    for(let i = 0; i < args.length; i++) {
-
+    for(let k = 0; k < array.length; k++) {
+        newArr.push(array[k]);
     }
+    for(let i = 0; i < args.length; i++) {
+        if(args[i] instanceof Array) {
+            for(let j = 0; j < args[i].length; j++) {
+                newArr.push((args[i])[j]);
+            }
+        } else {
+            newArr.push(args[i]);
+        }
+    }
+    return newArr;
+}
+export function copyWithin(array, target, start = undefined, end = undefined) {
+    let from = start || 0;
+    let to = end || array.length;
+    if(from < 0) {
+        from = array.length + from;
+    }
+    if(to < 0) {
+        to = array.length + to;
+    }
+    for(let i = from; i < to; i++, target++) {
+        if(target < array.length) {
+            array[target] = array[i];
+        } else {
+            break;
+        }
+    }
+    return array;
+}
+export function every(array, callback) {
+    for(let i = 0; i < array.length; i++) {
+        if(callback(array[i],i,array) == false) {
+            return false
+        }
+    }
+    return true;
+}
+export function fill(array, value, start = undefined, end = undefined) {
+    let from = start || 0;
+    let to = end || array.length;
+    for(let i = from; i < to; i++) {
+        array[i] = value;
+    }
+    return array;
+}
+export function filter(array, callback) {
+    const newArr = [];
+    for(let i = 0; i < array.length; i++) {
+        if(callback(array[i], i, array)) {
+            newArr.push(array[i]);
+        }
+    }
+    return newArr;
+}
+export function find(array, callback) {
+    for(let i = 0; i < array.length; i++) {
+        if(callback(array[i],i,array)) {
+            return array[i];
+        }
+    }
+}
+export function findIndex(array, callback) {
+    for(let i = 0; i < array.length; i++) {
+        if(callback(array[i], i, array)) {
+            return i;
+        }
+    }
+    return -1;
 }

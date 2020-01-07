@@ -1,4 +1,4 @@
-import {from, isIterable, isArrLike, of} from "./array_methods"
+import {from, isIterable, isArrLike, of, concat, copyWithin, every,fill,filter,find, findIndex} from "./array_methods"
 
 describe("tests for function from", function() {
     it("returns new array if passed argument is array like", () => {
@@ -82,5 +82,153 @@ describe("tests for of function",() => {
         expect(of({})).toStrictEqual([{}]);
         expect(of(String)).toStrictEqual([String]);
         expect(of(Number)).toStrictEqual([Number]);
+    })
+});
+describe("tests for the concat function", () => {
+    it("returns new array when the passed argument two arrays", () => {
+        expect(concat([1,2,3,4,5], [6,7,8,9])).toStrictEqual([1,2,3,4,5,6,7,8,9]);
+    });
+    it("returns new array when the passed argument is not an array", () => {
+        expect(concat([1],2,3,4)).toStrictEqual([1,2,3,4]);
+    });
+    it("returns new array when only the first argument is passed", () => {
+        expect(concat([1,2,3,4,5,6,7])).toStrictEqual([1,2,3,4,5,6,7]);
+        expect(concat([])).toStrictEqual([]);
+    })
+    it("returns new array when the passed argument/s is a set of arrays/empty arrays", () => {
+        expect(concat([1,2,3],[],[4,5,6])).toStrictEqual([1,2,3,4,5,6]);
+        expect(concat([],[],[])).toStrictEqual([]);
+    });
+    it("returns new array with a mixed set of arguments" , () => {
+        const func = function() {};
+        const symbol = Symbol();
+        expect(concat([1,2,3],4,[],[5,6,7],"8",{},null,undefined,symbol,func, "9,10")).
+        toStrictEqual([1,2,3,4,5,6,7,"8",{},null,undefined,symbol,func,"9,10"]);
+    })
+});
+describe("tests for the copyWithin function", () => {
+    const testArray = ['a', 'b', 'c', 'd', 'e'];
+    it("returns modified array", () => {
+        const array = testArray.slice();
+        expect(copyWithin(array, 0, 3,4)).toStrictEqual(["d", "b", "c", "d", "e"]);
+        expect(copyWithin(array, 1,3)).toStrictEqual(["d", "d", "e", "d", "e"]);
+    })
+    it("return modified array when the start position is negative", () => {
+        const array = testArray.slice();
+        expect(copyWithin(array, 0, -2)).toStrictEqual(["d","e","c","d","e"]);
+        expect(copyWithin(array, 0, -1)).toStrictEqual(["e","e","c","d","e"]);
+        expect(copyWithin(array, 0, -3, -2)).toStrictEqual(["c","e","c","d","e"]);
+    });
+    it("returns modified array when the end position is negative", () => {
+        const array = testArray.slice();
+        expect(copyWithin(array, 1, 2, -2)).toStrictEqual(["a","c","c","d","e"]);
+    });
+    it("returns modified array when start && end are not passed", () => {
+        let array = testArray.slice();
+        expect(copyWithin(array, 1)).toStrictEqual(["a","a","a","a","a"]);
+        array = testArray.slice();
+        expect(copyWithin(array, 2)).toStrictEqual(["a","b","a","b","a"]);
+    })
+});
+describe("tests for every function", () => {
+    it("returns true if the passed argument fits the condition of the callback function", () => {
+        expect(every([1,2,3,4], function(el) {
+            return el <= 4;
+        })).toBe(true);
+        expect(every([2,4,6,8,10], function(el) {
+            return el % 2 == 0 ;
+        })).toBe(true);
+        expect(every(["2","3","a","c"], function(el) {
+            return typeof el == "string";
+        })).toBe(true);
+        expect(every([1,2,3,4,5], function(el) {
+            return typeof el == "number";
+        })).toBe(true);
+        expect(every([function(){}, function(){}], function(el) {
+            return typeof el == "function";
+        })).toBe(true);
+        expect(every([Symbol(),Symbol()], function(el) {
+            return typeof el == "symbol";
+        })).toBe(true);
+        expect(every([function(){},""[Symbol.iterator]], function(el) { // мог бы написать [][Symbol.iterator] или (new Map)[Symbol.iterator]
+            return typeof el == "function";
+        })).toBe(true);
+    });
+    it("returns false if the passed argument does not fit the condition of the callback function",() => {
+        expect(every([1,2,3,4,5], function(el) {
+            return el > 10;
+        })).toBe(false);
+        expect(every([2,3,4,5,6,7], function(el) {
+            return el % 2 == 0;
+        })).toBe(false);
+    })
+});
+describe("tests for the fill function", () => {
+    it("returns modified array", () => {
+        expect(fill([1,2,3,4,5,6,7,8], 33, 0,8)).toStrictEqual([33,33,33,33,33,33,33,33]);
+    });
+    it("returns modified array", () => {
+        const func = function(){}
+        expect(fill([1,2,3,4,5,6,7,8], func, 3,8)).toStrictEqual([1,2,3,func,func,func,func,func]);
+    })
+    it("returns modified array when the starting position is not passed", () => {
+        expect(fill([1,2,3,4], 8, undefined, 4)).toStrictEqual([8,8,8,8]);
+    });
+    it("returns modified array when the end position is not passed", () => {
+        expect(fill([1,2,3,4], 8, 0)).toStrictEqual([8,8,8,8]);
+    });
+    it("returns modified array when both of the start/end positions are not passed", () => {
+        expect(fill([1,2,3,4], 8)).toStrictEqual([8,8,8,8]);
+    })
+})
+describe("tests for filter function", () => {
+    it("returns new array with the values that passed the callback's test", () => {
+        expect(filter([1,2,3,"str", 5,6,7], function(el) {
+            return typeof el == "string";
+        })).toStrictEqual(["str"]);
+        expect(filter([1,2,3,"str", 5,6,7], function(el) {
+            return el > 10
+        })).toStrictEqual([]);
+        expect(filter([1,2,3,"str", 5,6,7], function(el) {
+            return el % 2 == 0;
+        })).toStrictEqual([2,6]);
+    })
+});
+describe("tests for find function", () => {
+    it("returns a value that satisfies the given condition by the callback function", () => {
+        const func = function(){};
+        expect(find([1,2,3,4,5,6,7,8,9,"find", func], function(el) {
+            return el == 9
+        })).toBe(9);
+        expect(find([{0:"zero"},{name:"John"},String,Array], function(el) {
+            return el[0] == "zero"
+        })).toStrictEqual({0:"zero"});
+        expect(find([{0:"zero"},{name:"John"},String,Array], function(el) {
+            return el.name == "John"
+        })).toStrictEqual({name: "John"});
+        expect(find([{0:"zero"},{name:"John"},"",[]], function(el) {
+            return typeof el[Symbol.iterator] == "function"
+        })).toStrictEqual("");
+    });
+
+    it("returns undefined if the value is not found ", () => {
+        expect(find([{0:"zero"},{name:"John"},"",[]], function(el) {
+            return el == 9;
+        })).toStrictEqual(undefined);
+    })
+});
+describe("tests for the findIndex function", () => {
+    it("returns the index of an element that passed the callback's test", () => {
+        expect(findIndex([1,2,3,4,5,6,7,8], function (el) {
+            return el == 4;
+        })).toBe(3);
+        expect(findIndex([{name:"Lee"}, {0: "price"}, [1,2,3,4], "str", 9], function (el) {
+            return el[0] == "price";
+        })).toBe(1);
+    })
+    it("returns -1 when the passed value did not pass the callback's test", () => {
+        expect(findIndex([1,2,3,4,5,6,7,8], function(el) {
+            return el > 10;
+        })).toBe(-1);
     })
 })
