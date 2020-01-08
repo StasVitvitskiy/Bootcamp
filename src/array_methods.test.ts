@@ -1,4 +1,5 @@
-import {from, isIterable, isArrLike, of, concat, copyWithin, every,fill,filter,find, findIndex} from "./array_methods"
+import {from, isIterable, isArrLike, of, concat, copyWithin, every,fill,filter,find,
+    findIndex, flat, flatMap, forEach,includes,indexOf, join, joinConvertToString,lastIndexOf, map} from "./array_methods"
 
 describe("tests for function from", function() {
     it("returns new array if passed argument is array like", () => {
@@ -231,4 +232,149 @@ describe("tests for the findIndex function", () => {
             return el > 10;
         })).toBe(-1);
     })
+});
+describe("tests for the flat function", () => {
+    it("returns flat array when depth is 1 and the passed array is double nested", () => {
+        expect(flat([1,2,3,4,[5,6,7]], 1)).toStrictEqual([1,2,3,4,5,6,7]);
+    });
+    it("returns flat array, when the depth argument is not specified", () => {
+        expect(flat([1,2,3,4,5,6,7,8,[9,10]])).toStrictEqual([1,2,3,4,5,6,7,8,9,10]);
+    });
+    it("returns flattened array, when the depth argument is greater than 1", () => {
+        expect(flat([1, 2, [3, 4, [5, 6]]])).toStrictEqual([1, 2, 3, 4, [5, 6]]);
+        expect(flat([1, 2, [3, 4, [5, 6]]],2)).toStrictEqual([1, 2, 3, 4, 5, 6]);
+        expect(flat([1, 2, [3, 4, [5, 6, [7, 8, [9, 10]]]]], Infinity)).toStrictEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    });
+    it("returns passed array if the depth = 0", () => {
+        expect(flat([1,2,3,4,5,6],0)).toStrictEqual([1,2,3,4,5,6]);
+    });
+    it("returns empty array when the passed array is empty", () => {
+        expect(flat([])).toStrictEqual([]);
+    })
+});
+describe("tests for the flatMap function", () => {
+    it("removes all the negative numbers and split the odd numbers into an even number and a 1",() => {
+        const a = [5, 4, -3, 20, 17, -33, -4, 18];
+        expect(flatMap(a, function(el) {
+            if(el < 0) {
+                return [];
+            } else if(el % 2 == 0) {
+                return [el];
+            } else {
+                return [el-1,1];
+            }
+        })).toStrictEqual([4, 1, 4, 20, 16, 1, 18]);
+    })
+    it("doubles array elements", () => {
+        const arr = [1,2,3,4];
+        expect(flatMap(arr, (el) => {
+            return [[el*2]];
+        })).toStrictEqual([[2], [4], [6], [8]]);
+    });
+    it("generates a list of words from a list of sentences", () => {
+        const arr = ["it's Sunny in", "", "California"];
+        expect(flatMap(arr, (el) => {
+            return el.split(" ");
+        })).toStrictEqual(["it's","Sunny","in", "", "California"]);
+    });
+    it("flat maps array of mixed values", () => {
+        const arr = [1,2,3,[4,5,6],["str"], 7];
+        expect(flatMap(arr, (el) => {
+            return typeof el == "number"? el * 2 : [];
+        })).toStrictEqual([2,4,6,14]);
+    })
+});
+describe("tests for the forEach function", () => {
+    it("executes a provided function once for each array element", () => {
+        const name = ["S","t","a","s"];
+        expect(forEach(name, (el,i) => {
+            expect(el == name[i]).toBe(true);
+        })).toBe(undefined);
+    })
+});
+describe("tests for includes function", () => {
+    it("returns true if the passed value is amongst the values in the array", () => {
+        const emptyArr = [];
+        const array = [1, 2, 3];
+        const pets = ['cat', 'dog', 'bat'];
+        expect(includes([1,2,3,4,5,6,7,8,9], 3, 0)).toBe(true);
+        expect(includes(array,2)).toBe(true);
+        expect(includes(pets,'cat')).toBe(true);
+        expect(includes([1,2,3,4,5,6,7,8,"string"], "string" , 3)).toBe(true);
+        expect(includes([1,2,3,4,5,6,7,8,"string", [1,2,3], emptyArr], emptyArr , 8)).toBe(true);
+    })
+    it("returns false if the passed value is not amongst the value in the array", () => {
+        const pets = ['cat', 'dog', 'bat'];
+        const numbers = [1,2,3,4,5,6,7,8,9,10];
+        expect(includes(pets, 'at')).toBe(false);
+        expect(includes(numbers, 33)).toBe(false);
+        expect(includes(pets, 'CAT')).toBe(false);
+    })
+});
+describe("tests for the indexOf function", () => {
+    it("returns the first index at which a given element was found in the array", () => {
+        const beasts = ['ant', 'bison', 'camel', 'duck', 'bison'];
+        expect(indexOf(beasts, 'bison')).toBe(1);
+        expect(indexOf(beasts, 'bison', 2)).toBe(4);
+        expect(indexOf(beasts, 'bison', 1)).toBe(1);
+        expect(indexOf(beasts, 'bison', -1)).toBe(4);
+    })
+    it("returns -1 if the given element can not be found in the array", () => {
+        const beasts = ['ant', 'bison', 'camel', 'duck', 'bison'];
+        expect(indexOf(beasts, 'Ant')).toBe(-1);
+        expect(indexOf(beasts, 'ant',1)).toBe(-1);
+        expect(indexOf(beasts, 'ant',-3)).toBe(-1);
+    })
+});
+describe("tests for the join function", () => {
+    it("joins elements with different separators(comma by default)", () => {
+        const elements = ['Fire', 'Air', 'Water'];
+        expect(join(elements)).toStrictEqual("Fire,Air,Water");
+        expect(join(elements,"")).toStrictEqual("FireAirWater");
+        expect(join(elements,"-")).toStrictEqual("Fire-Air-Water");
+        expect(join(['Fire',[], 'Air', 'Water', null, undefined, []],"-")).toStrictEqual("Fire--Air-Water---");
+    })
+    it("returns single element without a separator", () => {
+        expect(join([1], ",,,,,,,")).toBe("1");
+    })
+    it("converts separator to a string", () => {
+        expect(join([1,2,3,4], 1)).toBe("1121314");
+    })
+    it("returns empty string", () => {
+        expect(join([])).toBe("")
+    });
+    it("joins array-like object", () => {
+        expect(join({0:1, 1:2, length:2}, "<->")).toBe("1<->2");
+    })
+});
+describe("tests for the lastIndexOf function", () => {
+    const animals = ['Dodo', 'Tiger', 'Penguin', 'Dodo'];
+    it("returns the last index at which a given element is found in the array", () => {
+        expect(lastIndexOf(animals, 'Dodo')).toBe(3);
+        expect(lastIndexOf(animals, 'Tiger')).toBe(1);
+    });
+    it("returns the last index of an element when start is greater than array length", () => {
+        expect(lastIndexOf(animals, 'Dodo', 10)).toBe(3);
+    });
+    it("returns -1 if the element was not found", () => {
+        expect(lastIndexOf(animals, 'Elephant', 4)).toBe(-1);
+    });
+    it("returns index of the element even if the start index is negative", () => {
+        expect(lastIndexOf(animals, 'Tiger', -3)).toBe(1);
+        expect(lastIndexOf(animals, 'Tiger', -4)).toBe(-1);
+    })
+});
+describe("tests for the map function", () => {
+    const array = [1, 4, 9, 16];
+    it("creates a new array populated with the results of calling a provided function on every element in the calling array", () => {
+        expect(map(array, function(el) {
+            return el*2;
+        })) .toStrictEqual([2,8,18,32]);
+    });
+    it("returns empty array if the passed array is empty", () => {
+        expect(map([], function(el) {
+            return el;
+        })).toStrictEqual([]);
+    })
 })
+
