@@ -1,5 +1,6 @@
-import {from, isIterable, isArrLike, of, concat, copyWithin, every,fill,filter,find,
-    findIndex, flat, flatMap, forEach,includes,indexOf, join, joinConvertToString,lastIndexOf, map} from "./array_methods"
+import {from, isIterable, isArrLike, of, concat, copyWithin, every,fill,filter,find, findIndex,
+    flat, flatMap, forEach,includes,indexOf, join,
+    joinConvertToString,lastIndexOf, map, pop,push,reduce} from "./array_methods"
 
 describe("tests for function from", function() {
     it("returns new array if passed argument is array like", () => {
@@ -376,5 +377,165 @@ describe("tests for the map function", () => {
             return el;
         })).toStrictEqual([]);
     })
+});
+describe("tests for the pop function", () => {
+    const plants = ['broccoli', 'cauliflower', 'cabbage', 'kale', 'tomato'];
+    it("deletes the last element from the passed array and returns it", () => {
+        const plantsCopy = plants.slice();
+        expect(pop(plantsCopy)).toStrictEqual('tomato');
+    });
+    it("when pop deletes the last element it also modifies array length", () => {
+        const plantsCopy = plants.slice();
+        pop(plantsCopy);
+        expect(plantsCopy.length).toBe(4);
+    });
+    it("returns undefined when empty array is passed", () => {
+        expect(pop([])).toBe(undefined);
+    });
+    it("correctly deletes all the elements if pop is used in a loop", () => {
+        const plantsCopy = plants.slice();
+        for(let i = plantsCopy.length; i >= 0; i--) {
+            pop(plantsCopy);
+        }
+        expect(plantsCopy.length).toBe(0)
+    });
+    it("correctly works with array with only one element", () => {
+        const array = [1];
+        pop(array);
+        expect(array.length).toBe(0)
+    })
+});
+describe("tests for the push method", () => {
+    const animals = ['pigs', 'goats', 'sheep'];
+    it("pushes one or more elements to the end of an array", () => {
+        const animalsCopy = animals.slice();
+        expect(push(animalsCopy, 'cows')).toStrictEqual(4);
+        expect(push(animalsCopy, 'chickens', 'cats', 'dogs')).toStrictEqual(7);
+        expect(animalsCopy).toStrictEqual(["pigs", "goats", "sheep", "cows", "chickens", "cats", "dogs"]);
+        expect(push([],"pigs")).toStrictEqual(1);
+    });
+});
+describe("tests for the reduce function", () => {
+    it("returns a single value as a result of reducing the array", () => {
+        expect(reduce([ { x: 22 }, { x: 42 } ], (acc, cur ) => {
+           return Math.max( acc.x, cur.x );
+        })).toBe(42);
+        expect(reduce([{ x: 22 }], (max, cur) => {
+            return Math.max(max, cur);
+        })).toStrictEqual({x: 22});
+    });
+    it("throws TypeError when calling on an empty array without an initial value", () => {
+        expect(() => reduce([], (acc, cur) => {
+            return Math.max(acc.x, cur.x);
+        })).toThrow(TypeError);
+    });
+    it("works for empty or larger arrays", () => {
+        const array = [ { x: 22 }, { x: 42 } ].map( el => el.x );
+        expect(reduce(array, (max, cur) => {
+            return Math.max( max, cur );
+        }, -Infinity)).toBe(42);
+    });
+    it("returns the initial value when array length is 0", () => {
+        expect(reduce([], (acc, cur) => {
+            return acc + cur;
+        }, 10)).toBe(10);
+    });
+    it("returns a single value as a result of reducing the array with more than 2 elements", () => {
+        expect(reduce([{ x: 22 }, { x: 42 }, {x: 55}, {x: 33},{x: 12}], (acc, cur) => {
+            return acc + cur.x;
+        }, 0)).toBe(164)
+    });
+    it("converts array into an array like object", () => {
+        const animals = ['pigs', 'goats', 'sheep'];
+      expect(reduce(animals, (acc, cur, index) => {
+          acc[index] = cur;
+          acc.length = index+1;
+          return acc;
+      },{})).toStrictEqual({0:'pigs',1:'goats', 2: 'sheep', length: 3});
+    });
+    it("returns max or min depending on the condition", () => {
+        expect(reduce([1,2,3,4,5,6,7,8,33,22,15,77,93], (acc, cur) => {
+            return Math.max(acc, cur);
+        })).toBe(93);
+        expect(reduce([111,22,3,43,51,16,27,38,33,22,15,77,93], (acc, cur) => {
+            return Math.min(acc, cur);
+        })).toBe(3);
+        const arr = [231,24,433,24,25,36,47,48,33,24,12,77,93];
+        expect(Object.keys(reduce(arr, (acc, cur) => {
+            acc[cur] = 1;
+            return acc;
+        }, {})).map(function(el) {
+            return +el;
+        })).toStrictEqual([12,24,25,33,36,47,48,77,93,231,433]);
+    })
+    it("reduces array to a string", () => {
+        const words = ["a-2", "b-3", "c-4"];
+        expect(reduce(words, (acc, cur) => {
+                const parts = cur.split("-");
+                const repeats = +parts[1];
+                if(acc != "") {
+                    acc += " ";
+                }
+                for(let i = 0; i <= repeats; i++) {
+                    acc = acc + parts[0];
+                }
+                return acc;
+            },"")
+
+        ).toBe("aaa bbbb ccccc")
+    });
+    it("deletes all negative and odd elements", () => {
+        const array = [1,2,3,4,-2,333,244,145,-55,66,-77,99,124];
+        expect(reduce(array, (acc, cur) => {
+            if(cur > 0 && cur % 2 == 0) {
+                acc.push(cur);
+            }
+            return acc;
+        }, [])).toStrictEqual([2,4,244,66,124]);
+    });
+    it("merges array of objects into one", () => {
+        const arrayOfObjects = [
+            {one:1},
+            {age:25,name: 'John'},
+            {height:6, weight: 185},
+            {four:4},
+            {five:5},
+            {six:6, badNumber: 666},
+            {seven:7}];
+        expect(reduce(arrayOfObjects, (acc, cur) => {
+            for(let i in cur) {
+                acc[i] = cur[i];
+            }
+            return acc;
+        }, {})).toStrictEqual(
+            {one:1,age:25,
+            name: 'John',
+            height:6,
+            weight: 185,
+            four:4,
+            five:5,
+            six:6,
+            badNumber: 666,
+            seven:7});
+    })
+    it("reverses array", () => {
+        const array = [9,8,7,6,5,4,3,2,1];
+        expect(reduce(array, (acc, cur) => {
+            acc.unshift(cur);
+            return acc;
+        }, [])).toStrictEqual([1,2,3,4,5,6,7,8,9]);
+    })
+    it("reverses string array", () => {
+        const arrayOfStrings = ["cat", "bat", "sheep"];
+        expect(reduce(arrayOfStrings, (acc, cur) => {
+            let reversed = "";
+            for(let i = 0; i < cur.length; i++) {
+                reversed = cur[i] + reversed;
+            }
+            acc.unshift(reversed);
+            return acc;
+        }, [])).toStrictEqual(["peehs", "tab", "tac"]);
+    })
 })
+
 

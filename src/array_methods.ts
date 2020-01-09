@@ -191,4 +191,35 @@ export const map = (array, callback) => {
         newArr.push(callback(array[i], i, array));
     }
     return newArr;
+};
+export const pop = (array) => {
+    if(array.length != 0 && array.length != undefined) {
+        const lastEl = array[array.length - 1];
+        array.length = array.length - 1;
+        return lastEl;
+    } else {
+        return undefined;
+    }
+};
+export const push = (array, ...elementN) => {
+    for(let i = 0; i < elementN.length; i ++) {
+        array[array.length] = elementN[i]
+    }
+    return array.length;
+}
+export function reduce(array, callback, initialValue = undefined) {
+    if(array.length == 0) {
+        if(initialValue == undefined) {
+            throw new TypeError("Initial Value is undefined");
+        } else {
+            return initialValue;
+        }
+    } else {
+        let acc = initialValue != undefined ? initialValue : array[0];
+        const from = initialValue != undefined? 0 : 1;
+        for(let i = from; i < array.length; i++) {
+            acc = callback(acc, array[i], i, array);
+        }
+        return acc;
+    }
 }
