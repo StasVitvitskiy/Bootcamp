@@ -169,7 +169,7 @@ export function join(array, separator: string | number = ",") {
     }
     return result;
 }
-export const joinConvertToString = (el) => {
+const joinConvertToString = (el) => {
     if(el == undefined || el == null || (el instanceof Array && el.length == 0)) {
         return "";
     } else {
@@ -221,5 +221,123 @@ export function reduce(array, callback, initialValue = undefined) {
             acc = callback(acc, array[i], i, array);
         }
         return acc;
+    }
+}
+export const reduceRight = (array,callback, initialValue = undefined) => {
+    if(array.length == 0) {
+        if(initialValue == undefined) {
+            throw new TypeError("Initial Value is undefined");
+        } else {
+            return initialValue;
+        }
+    } else {
+        let acc = initialValue != undefined ? initialValue : array[array.length - 1];
+        const from = initialValue != undefined ? array.length - 1 : array.length - 2;
+        for(let i = from; i >= 0; i --) {
+            acc = callback(acc, array[i], i, array);
+        }
+        return acc;
+    }
+};
+export const reverse = (array) => {
+    const newArr = [];
+    if(array.length == 0) {
+        return [];
+    }
+    for (let i = array.length - 1; i >= 0; i--) {
+        newArr.push(array[i]);
+    }
+    return newArr;
+};
+export const shift = (array) => {
+    if(array.length == undefined || array.length == 0) {
+        return undefined
+    } else {
+        const result = array[0];
+        for(let i = 1; i < array.length; i++) {
+            array[i-1] = array[i];
+        }
+        array.length = array.length - 1;
+        if(array instanceof Array == false) {
+            delete array[array.length]
+        }
+        return result;
+    }
+};
+export const slice = (array, begin = 0, end = array.length) => {
+    const newArr = [];
+    let from = begin < 0 ? array.length + begin : begin;
+    let to = end < 0 ? array.length + end : Math.min(end, array.length);
+    for(let i = from; i < to; i++) {
+        newArr.push(array[i]);
+    }
+    return newArr;
+};
+export const some = (array, callback) => {
+    for(let i = 0; i < array.length; i++) {
+        if(callback(array[i], i, array)) {
+            return true;
+        }
+    }
+    return false;
+};
+export const splice = (array,start, deleteCount = array.length, ...items) => {
+    const deleted = [];
+    let from = start < 0 ? array.length + start : start;
+    let to = Math.min(from + deleteCount, array.length);
+    for(let i = from; i < to; i++) {
+        if(items.length == 0) {
+            deleted.push(array[from]);
+            shiftLeft(array, from);
+        } else {
+            deleted.push(array[i]);
+            array[i] = items.shift();
+        }
+    }
+    for(let j = to, k = 0; k < items.length; j++, k++) {
+        shiftRight(array, j);
+        array[j] = items[k];
+    }
+    return deleted;
+};
+const shiftLeft = (arr, begin) => {
+    const from = begin + 1;
+    for(let i = from; i < arr.length; i++) {
+        arr[i -1] = arr[i];
+    }
+    arr.length = arr.length - 1;
+    if(arr instanceof Array == false) {
+        delete arr[arr.length];
+    }
+};
+const shiftRight = (arr, begin) => {
+    const from = Math.min(arr.length, begin);
+    for(let i = arr.length; i > from; i-- ) {
+        arr[i] = arr[i - 1];
+    }
+    if(arr instanceof Array == false) {
+        arr.length ++;
+    }
+}
+export const toString = (array) => {
+    let string = "";
+    for(let i = 0; i < array.length; i++) {
+        if(i == 0) {
+            string += array[i];
+        } else {
+            string = string + "," + array[i];
+        }
+    }
+    return string;
+};
+export const unshift = (array, ...args) => {
+    if(array.length == undefined) {
+        return 0;
+    } else {
+        for(let i = args.length - 1; i >= 0; i--) {
+            shiftRight(array, 0);
+            array[0] = args[i];
+        }
+        return array.length;
     }
 }

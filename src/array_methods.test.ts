@@ -1,6 +1,7 @@
 import {from, isIterable, isArrLike, of, concat, copyWithin, every,fill,filter,find, findIndex,
-    flat, flatMap, forEach,includes,indexOf, join,
-    joinConvertToString,lastIndexOf, map, pop,push,reduce} from "./array_methods"
+    flat, flatMap, forEach,includes,indexOf, join,lastIndexOf, map, pop,push,
+    reduce,reduceRight,reverse, shift, slice, some, splice,toString,unshift} from "./array_methods"
+
 
 describe("tests for function from", function() {
     it("returns new array if passed argument is array like", () => {
@@ -536,6 +537,317 @@ describe("tests for the reduce function", () => {
             return acc;
         }, [])).toStrictEqual(["peehs", "tab", "tac"]);
     })
+});
+describe("tests for the reduceRight function", () => {
+    it("returns a single value as a result of reducing the array", () => {
+        expect(reduceRight([ { x: 22 }, { x: 42 } ], (acc, cur ) => {
+            return Math.max( acc.x, cur.x );
+        })).toBe(42);
+        expect(reduceRight([{ x: 22 }], (max, cur) => {
+            return Math.max(max, cur);
+        })).toStrictEqual({x: 22});
+    });
+    it("throws TypeError when calling on an empty array without an initial value", () => {
+        expect(() => reduceRight([], (acc, cur) => {
+            return Math.max(acc.x, cur.x);
+        })).toThrow(TypeError);
+    });
+    it("works for empty or larger arrays", () => {
+        const array = [ { x: 22 }, { x: 42 } ].map( el => el.x );
+        expect(reduceRight(array, (max, cur) => {
+            return Math.max( max, cur );
+        }, -Infinity)).toBe(42);
+    });
+    it("returns the initial value when array length is 0", () => {
+        expect(reduceRight([], (acc, cur) => {
+            return acc + cur;
+        }, 10)).toBe(10);
+    });
+    it("returns a single value as a result of reducing the array with more than 2 elements", () => {
+        expect(reduceRight([{ x: 22 }, { x: 42 }, {x: 55}, {x: 33},{x: 12}], (acc, cur) => {
+            return acc + cur.x;
+        }, 0)).toBe(164)
+    });
+    it("converts array into an array like object", () => {
+        const animals = ['pigs', 'goats', 'sheep'];
+        expect(reduceRight(animals, (acc, cur, index) => {
+            acc[index] = cur;
+            acc.length++;
+            return acc;
+        },{length:0})).toStrictEqual({2:'sheep',1:'goats', 0: 'pigs', length: 3});
+    });
+    it("reverses array", () => {
+        const array = [9,8,7,6,5,4,3,2,1];
+        expect(reduceRight(array, (acc, cur) => {
+            acc.push(cur);
+            return acc;
+        },[])).toStrictEqual([1,2,3,4,5,6,7,8,9]);
+    })
+    it("reduces array to a string", () => {
+        const words = ["a-2", "b-3", "c-4"];
+        expect(reduceRight(words, (acc, cur) => {
+                const parts = cur.split("-");
+                const repeats = +parts[1];
+                if(acc != "") {
+                    acc = " " + acc;
+                }
+                for(let i = 0; i <= repeats; i++) {
+                    acc = parts[0] + acc;
+                }
+                return acc;
+            },"")
+
+        ).toBe("aaa bbbb ccccc")
+    });
+
+    it("deletes all negative and odd elements", () => {
+        const array = [1,2,3,4,-2,333,244,145,-55,66,-77,99,124];
+        expect(reduceRight(array, (acc, cur) => {
+            if(cur > 0 && cur % 2 == 0) {
+                acc.unshift(cur);
+            }
+            return acc;
+        }, [])).toStrictEqual([2,4,244,66,124]);
+    });
+
+    it("merges array of objects into one", () => {
+        const arrayOfObjects = [
+            {one:1},
+            {age:25,name: 'John'},
+            {height:6, weight: 185},
+            {four:4},
+            {five:5},
+            {six:6, badNumber: 666},
+            {seven:7}];
+        expect(reduceRight(arrayOfObjects, (acc, cur) => {
+            for(let i in cur) {
+                acc[i] = cur[i];
+            }
+            return acc;
+        }, {})).toStrictEqual(
+            {one:1,age:25,
+                name: 'John',
+                height:6,
+                weight: 185,
+                four:4,
+                five:5,
+                six:6,
+                badNumber: 666,
+                seven:7});
+    });
+    it("reverses string array", () => {
+        const arrayOfStrings = ["cat", "bat", "sheep"];
+        expect(reduce(arrayOfStrings, (acc, cur) => {
+            let reversed = "";
+            for(let i = 0; i < cur.length; i++) {
+                reversed = cur[i] + reversed;
+            }
+            acc.unshift(reversed);
+            return acc;
+        }, [])).toStrictEqual(["peehs", "tab", "tac"]);
+    })
+});
+describe("tests for reverse function",() => {
+    it("reverses array", () => {
+        const array = ['one', 'two', 'three'];
+        const arrayLike = {0: 1, 1: 2, 2: 3, length: 3};
+        expect(reverse(array)).toStrictEqual(["three", "two", "one"]);
+        expect(reverse(arrayLike)).toStrictEqual([3,2,1]);
+    });
+    it("returns empty array when the passed argument is an empty array", () => {
+        expect(reverse([])).toStrictEqual([]);
+    })
+
+});
+describe("tests for the shift function", () => {
+    it("deletes the first element from the array and modifies its length", () => {
+        const array = [1, 2, 3];
+        expect(shift(array)).toStrictEqual(1);
+        expect(array).toStrictEqual([2,3]);
+        expect(array.length).toBe(2);
+    });
+    it("returns undefined when the passed array is not an array like object or is empty", () => {
+        expect(shift([])).toBe(undefined);
+        expect(shift({one:1})).toBe(undefined);
+    });
+    it("deletes the element", () => {
+        const array = [1];
+        const arrayLike = {0: 1, 1: 2, 2: 3, length: 3};
+        expect(shift(array)).toBe(1);
+        expect(array.length).toBe(0);
+        expect(array).toStrictEqual([]);
+        expect(shift(arrayLike)).toBe(1);
+        expect(arrayLike.length).toBe(2);
+        expect(arrayLike).toStrictEqual({0: 2, 1: 3, length: 2});
+    })
+    it("deletes multiple elements", () => {
+        const arr = [1,2,3,4,5,6,7,8,9,10];
+        const arrLike = {0:1, 1:2, 2:3, 3:4, 4:5, 5:6, 6:7, 7:8, 8:9, 9:10, length:10};
+        const iterations = arr.length;
+        for(let i = 0; i < iterations; i++) {
+            const deleted = arr[0];
+            const arrCopy = arr.slice(1);
+            const newLength = arr.length - 1;
+            expect(shift(arr)).toBe(deleted);
+            expect(arr).toStrictEqual(arrCopy);
+            expect(arr.length).toBe(newLength);
+
+            const deletedFromArrLike = arrLike[0];
+            const arrLikeCopy = Object.assign({}, arrLike);
+            for(let j = 1; j < arrLikeCopy.length; j++) {
+                arrLikeCopy[j-1] = arrLikeCopy[j];
+            }
+            delete arrLikeCopy[arrLikeCopy.length - 1];
+            const newArrLikeLength = arrLikeCopy.length - 1;
+            arrLikeCopy.length = arrLikeCopy.length - 1;
+            expect(shift(arrLike)).toStrictEqual(deletedFromArrLike);
+            expect(arrLike).toStrictEqual(arrLikeCopy);
+            expect(arrLike.length).toStrictEqual(newArrLikeLength);
+        }
+    })
+    it("calls shift number of times with the empty argument", () => {
+        const array = [];
+        const arrLike = {length:0};
+        for(let i = 0; i < 10; i++) {
+            expect(shift(array)).toBe(undefined);
+            expect(shift(arrLike)).toBe(undefined);
+        }
+        expect(array).toStrictEqual([]);
+        expect(array.length).toStrictEqual(0);
+        expect(arrLike).toStrictEqual({length:0});
+        expect(arrLike.length).toStrictEqual(0);
+    })
+});
+describe("tests for the slice function", () => {
+    it("slices the array", () => {
+        const animals = ['ant', 'bison', 'camel', 'duck', 'elephant'];
+        const arrayLike = {0:'ant', 1:'bison', 2:'camel', 3:'duck', 4:'elephant',length:5};
+        expect(slice(animals, 2)).toStrictEqual(["camel", "duck", "elephant"]);
+        expect(slice(animals, 2,4)).toStrictEqual(["camel", "duck"]);
+        expect(slice(animals, 1,5)).toStrictEqual(['bison', 'camel', 'duck', 'elephant']);
+        expect(slice(arrayLike, 1,5)).toStrictEqual(['bison', 'camel', 'duck', 'elephant']);
+    });
+    it("returns empty array",() => {
+        const emptyArr = [];
+        const emptyArrLike = {length:0};
+        expect(slice(emptyArr)).toStrictEqual([]);
+        expect(slice(emptyArrLike)).toStrictEqual([]);
+    });
+    it("works correctly when begin/end are out of bounds", () => {
+        const animals = ['ant', 'bison', 'camel', 'duck', 'elephant'];
+        expect(slice(animals, 6)).toStrictEqual([]);
+        expect(slice(animals, 155)).toStrictEqual([]);
+        expect(slice(animals, -5)).toStrictEqual(['ant', 'bison', 'camel', 'duck', 'elephant']);
+        expect(slice(animals, undefined, 6)).toStrictEqual(['ant', 'bison', 'camel', 'duck', 'elephant']);
+        expect(slice(animals, undefined, -5)).toStrictEqual([]);
+        expect(slice(animals, undefined, 77)).toStrictEqual(['ant', 'bison', 'camel', 'duck', 'elephant']);
+        expect(slice(animals, 22, 77)).toStrictEqual([]);
+        expect(slice(animals, -22, -77)).toStrictEqual([]);
+        expect(slice(animals, -2, -1)).toStrictEqual(['duck']);
+    })
+});
+describe("tests for the some function", () => {
+    it("returns true if the array passes the test implemented by the callback", () => {
+        const array = [1, 2, 3, 4, 5];
+        const arrayOfStr = ["1", "2", "3", "4", "5"];
+        const arrayLike = {0:"1", 1:"2", 2:"3", 3:"4", 4:"5", length: 5};
+        expect(some(array, (el) => {
+            return el % 2 === 0;
+        })).toBe(true);
+        expect(some(array, (el) => {
+            return typeof el === "number";
+        })).toBe(true);
+        expect(some(arrayOfStr, (el) => {
+            return +el > 1;
+        })).toBe(true);
+        expect(some(arrayLike, (el) => {
+            return typeof +el === "number";
+        })).toBe(true);
+    });
+    it("returns false", () => {
+        const array = [1, 2, 3, 4, 5];
+        const arrayLike = {0:"1", 1:"2", 2:"3", 3:"4", 4:"5", length: 5};
+        const emptyArrayLike = {length: 0};
+        expect(some(array, (el) => {
+            return typeof el === "string"
+        })).toBe(false);
+        expect(some([], (el) => {
+            return el;
+        })).toBe(false);
+        expect(some(emptyArrayLike, (el) => {
+            return el;
+        })).toBe(false);
+        expect(some(arrayLike, (el) => {
+            return el > 7;
+        })).toBe(false)
+    })
+});
+describe("tests for the splice function", () => {
+    it("inserts elements at index", () => {
+        const months = ['Jan', 'March', 'April', 'June'];
+        let myFish = ['angel', 'clown', 'mandarin', 'sturgeon']
+        expect(splice(months, 1, 0, 'Feb')).toStrictEqual([]);
+        expect(months).toStrictEqual(["Jan", "Feb", "March", "April", "June"]);
+        expect(months.length).toBe(5);
+
+        expect(splice(months, 4, 1, 'May')).toStrictEqual(['June']);
+        expect(months).toStrictEqual(["Jan", "Feb", "March", "April", "May"]);
+
+        expect(splice(myFish, 2, 0, 'drum')).toStrictEqual([]);
+        expect(myFish).toStrictEqual(['angel', 'clown', 'drum','mandarin', 'sturgeon']);
+
+        expect(splice(myFish, 2, 0, 'drum', 'guitar')).toStrictEqual([]);
+        expect(myFish).toStrictEqual(['angel', 'clown', 'drum', 'guitar', 'drum','mandarin', 'sturgeon']);
+
+        expect(splice(myFish, 2, 2)).toStrictEqual(['drum', 'guitar'])
+    });
+    it("works with elements of an array like object", () => {
+        const arrayLike = {0:"zero", 1: "one", 2: "two", 3: "three", length:4};
+
+        expect(splice(arrayLike, 1, 1)).toStrictEqual(["one"]);
+        expect(arrayLike.length).toBe(3);
+        expect(arrayLike).toStrictEqual({0:"zero", 1:"two", 2:"three", length: 3});
+
+        expect(splice(arrayLike, 1, 0, "oneAdded")). toStrictEqual([]);
+        expect(arrayLike). toStrictEqual({0:"zero", 1:"oneAdded", 2:"two", 3:"three", length: 4});
+    });
+    it("works correctly if the deleteCount is omitted", () => {
+        const array = [1,2,3,4,5];
+        expect(splice(array, 1)).toStrictEqual([2,3,4,5]);
+        expect(splice(array, 0)).toStrictEqual([1]);
+    });
+    it("works correctly with start < 0", () => {
+        const array = [1,2,3,4,5];
+        expect(splice(array, -3)).toStrictEqual([3,4,5]);
+    })
+});
+describe("tests for the toString function", () => {
+    it("returns a string representing the specified array and its elements", () => {
+        const array = [1, 2, 'a', '1a'];
+        expect(toString(array)).toBe("1,2,a,1a");
+    });
+    it("returns an empty string", () => {
+        expect(toString([])).toBe("");
+    });
+    it("joins the array and returns one string containing each array element separated by commas", () => {
+        expect(toString({0:"one",1:"two", length:2})).toBe("one,two");
+    })
+});
+describe("tests for the unshift function", () => {
+    it("adds one or more elements to the beginning of an array and returns the array's new length", () => {
+        const array = [1,2,3];
+        const arrayLike = {0:"zero", 1: "one", 2: "two", length:3};
+        expect(unshift(array, 4,5)).toBe(5);
+        expect(array).toStrictEqual([4,5,1,2,3]);
+        expect(unshift(arrayLike, "beginning")).toBe(4);
+        expect(arrayLike).toStrictEqual({"0": "beginning", "1": "zero", "2": "one", "3": "two", "length": 4});
+    });
+    it("returns 0 if the array/array like object is empty", () => {
+        expect(unshift([])).toBe(0);
+        expect(unshift({length:0})).toBe(0);
+        expect(unshift({})).toBe(0);
+    })
 })
+
 
 
