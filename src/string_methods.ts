@@ -97,4 +97,73 @@ export const padEnd = (string, targetLength, padString = " ") => {
         }
     }
     return newString;
+};
+export const padStart = (string, targetLength, padString = " ") => {
+    let newString = String(string);
+    const resultLength = Math.max(targetLength, string.length)
+    if(padString == "") {
+        return newString;
+    }
+    for(let i = string.length, j = padString.length -1; i < resultLength; i++, j--) {
+        if(j < 0) {
+            j = padString.length -1;
+        }
+        newString = padString[j] + newString;
+    }
+    return newString;
+};
+export const repeat = (string, count) => {
+    let newString = String(string);
+    let result = newString;
+    const iterations = Math.floor(count);
+    if(iterations == 0) {
+        return "";
+    }
+    if(iterations < 0) {
+        throw new RangeError("repeat count must be non negative");
+    }
+    if(iterations == Infinity) {
+        throw new RangeError("repeat must be less than infinity");
+    }
+    for(let i = 1; i < iterations; i++) {
+        result += newString;
+    }
+    return result;
+};
+export const slice = (string, beginIndex, endIndex = string.length) => {
+    const begin = beginIndex < 0 ? string.length + beginIndex : beginIndex;
+    const end = endIndex < 0 ? string.length + endIndex : endIndex;
+    let newString = "";
+    let str = String(string);
+    if(str == "") {
+        return "";
+    }
+    for(let i = begin; i < end; i++) {
+        newString = newString + str[i];
+    }
+    return newString;
+};
+export const split = (str, separator = undefined, lim = Infinity) => {
+    const resultArr = [];
+    const strSeparator = String(separator);
+    const string = String(str) + separator;
+    let tempString = "";
+    for(let i = 0; i < string.length && lim > 0;) {
+        if(separator == "") {
+            resultArr.push(string[i++]);
+        } else {
+            if(string.slice(i, i + strSeparator.length) == strSeparator) {
+                i += strSeparator.length;
+                resultArr.push(tempString);
+                if(resultArr.length == lim) {
+                    return resultArr;
+                }
+                tempString = "";
+            } else {
+                tempString += string[i];
+                i++;
+            }
+        }
+    }
+    return resultArr;
 }
