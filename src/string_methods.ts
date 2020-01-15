@@ -166,4 +166,66 @@ export const split = (str, separator = undefined, lim = Infinity) => {
         }
     }
     return resultArr;
+};
+export const startsWith = (str, searchString, position = 0) => {
+    const string = String(str);
+    const from = Math.min(Math.max(0,position), string.length-1);
+    const whatIsSearched = String(searchString);
+    const to = from + whatIsSearched.length;
+    if(whatIsSearched == "") {
+        return true;
+    }
+    for(let i = from, j = 0; i < to; i++) {
+        if(string[i] == whatIsSearched[j]) {
+            j++;
+            if(j == whatIsSearched.length) {
+                return true;
+            }
+        } else {
+            return false;
+        }
+    }
+};
+export const substring = (str, indexStart, indexEnd = str.length) => {
+    const string = String(str);
+    const start = isNaN(indexStart) ? 0 : Math.min(Math.max(0, indexStart), string.length);
+    const end = isNaN(indexEnd) ? 0 : Math.min(Math.max(0, indexEnd), string.length);
+    const from = Math.min(start, end);
+    const to = Math.max(start, end);
+    let substr = "";
+    for(let i = from; i < to; i++) {
+        substr += string[i];
+    }
+    return substr;
+};
+export const trim = (str) => {
+    return trimEnd(trimStart(str));
+};
+export const trimStart = (str) => {
+    const string = String(str);
+    let newStr = "";
+    let canALlBeConcat = false;
+    for(let i = 0; i < string.length; i++) {
+        if(string[i] != " " && canALlBeConcat == false) {
+            canALlBeConcat = true;
+        }
+        if(canALlBeConcat) {
+            newStr += string[i];
+        }
+    }
+    return newStr;
+}
+export const trimEnd = (str) => {
+    const string = String(str);
+    let newStr = "";
+    let canALlBeConcat = false;
+    for(let i = string.length -1; i >= 0; i--) {
+        if(string[i] != " " && canALlBeConcat == false) {
+            canALlBeConcat = true;
+        }
+        if(canALlBeConcat) {
+            newStr = string[i] + newStr;
+        }
+    }
+    return newStr;
 }

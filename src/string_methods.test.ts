@@ -1,4 +1,5 @@
-import {concat, endsWith,includes,indexOf,lastIndexOf,padEnd, padStart, repeat, slice, split} from "./string_methods"
+import {concat, endsWith,includes,indexOf,lastIndexOf,padEnd, padStart, repeat, slice, split, startsWith,
+substring,trim,trimStart, trimEnd} from "./string_methods"
 describe("tests for the concat function", () => {
     it("concatenates strings and returns a new string", () => {
         const str1 = 'Hello';
@@ -171,5 +172,92 @@ describe("tests for the split function", () => {
         const strReverse = split(string,'').reverse().join('');
         expect(strReverse).toBe("lkjhgfdsa");
     })
-})
+});
+describe("tests for the startsWith function", () => {
+    const str1 = 'Saturday night plans';
+    let str2 = 'To be, or not to be, that is the question.';
+    it("determines whether a string begins with the characters of a specified string, returning true", () => {
+        expect(startsWith(str1,"Sat")).toBe(true);
+        expect(startsWith(str1,"Sat", - 20)).toBe(true);
+        expect(startsWith(str2,'not to be', 10)).toBe(true);
+        expect(startsWith(str2,'To be')).toBe(true);
+        expect(startsWith(str2,'')).toBe(true);
+        expect(startsWith(str2,' ', 2)).toBe(true);
+        expect(startsWith(str1,'Saturday night plans')).toBe(true);
+        expect(startsWith("",'')).toBe(true);
+    });
+    it("returns false if a string does not begin with the characters of a specified string", () => {
+        expect(startsWith(str2,'not to be')).toBe(false);
+        expect(startsWith(str1,'Sat', 3)).toBe(false);
+    })
+});
+describe("tests for the substring function", () => {
+    it("returns the part of the string between the start and end indexes, or to the end of the string", () => {
+        const str = 'Mozilla';
+        expect(substring(str, 1,3)).toBe("oz");
+        expect(substring(str, 2)).toBe("zilla");
+        expect(substring(str, 4,7)).toBe("lla");
+        expect(substring(str, 7,4)).toBe("lla");
+        expect(substring(str, 0,1)).toBe("M");
+        expect(substring(str, 1,0)).toBe("M");
+        expect(substring(str, 0,10)).toBe("Mozilla");
+        expect(substring(str, NaN)).toBe("Mozilla");
+        expect(substring(str, NaN, NaN)).toBe("");
+        expect(substring(str, 0, 6)).toBe("Mozill");
+        expect(substring(str, 4)).toBe("lla");
+        expect(substring(str, 0, 7)).toBe("Mozilla");
+        expect(substring(str, str.length - 4)).toBe("illa");
+        expect(substring(str, str.length - 5)).toBe("zilla");
+        expect(substring(str, -2, -5)).toBe("");
+        expect(substring(str, -5, -2)).toBe("");
+        expect(substring(str, -2,)).toBe("Mozilla");
+        expect(substring("", -2,)).toBe("");
+        expect(substring("", NaN,)).toBe("");
+        expect(substring("", 0,)).toBe("");
+        expect(substring("", 10,20)).toBe("");
+    })
+});
+describe("tests for the trim function", () => {
+    it("removes whitespace from both ends of a string", () => {
+        const greeting = '   Hello world!   ';
+        let orig = '   foo  ';
+        expect(trim(greeting)).toBe("Hello world!");
+        expect(greeting).toBe('   Hello world!   ');
+        expect(trim(orig)).toBe('foo');
+        expect(trim('foo    ')).toBe('foo');
+        expect(trim('      ')).toBe('');
+        expect(trim('1      1')).toBe('1      1');
+        expect(trim(' 1      1 ')).toBe('1      1');
+        expect(trim('    1  1      1')).toBe('1  1      1');
+        expect(trim('          1')).toBe('1');
+        expect(trim('')).toBe('');
+
+    })
+});
+describe("tests for the trimStart function", () => {
+    it("removes whitespace from the beginning of a string", () => {
+        const greeting = '   Hello world!   ';
+        let str = '   foo  ';
+        expect(trimStart(greeting)).toBe("Hello world!   ");
+        str = trimStart(str);
+        expect(str.length).toBe(5);
+        expect(str).toBe('foo  ');
+        expect(trimStart("")).toBe('');
+        expect(trimStart("     1")).toBe('1');
+    })
+});
+describe("tests for the trimEnd function", () => {
+    it("removes whitespace from the end of a string", () => {
+        const greeting = '   Hello world!   ';
+        let str = '   foo  ';
+        expect(trimEnd(greeting)).toBe("   Hello world!");
+        str = trimEnd(str);
+        expect(str.length).toBe(6);
+        expect(str).toBe('   foo');
+        expect(trimEnd("")).toBe('');
+        expect(trimEnd("1     ")).toBe('1');
+    })
+});
+
+
 
