@@ -163,4 +163,26 @@ let animal = {
             this.leftEye.closed = false;
         }, 1000)
     }
+};
+let ladder = {
+    steps:0,
+    up: function() {
+        this.steps++;
+        return this;
+    },
+    down: function() {
+        this.steps--;
+        return this;
+    },
+    showSteps: function() {
+        console.log(this.steps);
+        return this;
+    }
 }
+ladder.up().up().down().showSteps();
+
+
+
+const up = ladder.up;
+/* this == undefined because function is not being called on object, but on itself; */
+console.log(up());
