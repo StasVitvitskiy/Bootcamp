@@ -14,4 +14,6 @@ export const camelize = (str) => {
             return el;
         }
     }).join("");
-}
+};
+
+
