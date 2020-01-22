@@ -1,4 +1,5 @@
-import {getMaxSubSum, filterRangeInPlace, Calculator, shuffle} from "./array_tasks"
+import {getMaxSubSum, filterRangeInPlace, Calculator, shuffle,unique,range,createIterable,
+    makeIterable, iterableFrom,iterablFromWithMap} from "./array_tasks"
 describe("tests for the getMaxSubSum function", () => {
     it("returns the max sum in the sub array", () => {
         expect(getMaxSubSum([-1, 2, 3, -9])).toBe(5);
@@ -77,6 +78,101 @@ describe("tests for the shuffle function", () => {
     });
     it("swaps the elements when the length is 2", () => {
         expect(shuffle([1,2])).toStrictEqual([2,1]);
+    })
+});
+describe("unique", function() {
+    it("removes non-unique elements", function() {
+        let strings = ["Hare", "Krishna", "Hare", "Krishna",
+            "Krishna", "Krishna", "Hare", "Hare", ":-O"
+        ];
+
+        expect(unique(strings)).toStrictEqual(["Hare", "Krishna", ":-O"]);
+    });
+
+    it("does not change the source array", function() {
+        let strings = ["Krishna", "Krishna", "Hare", "Hare"];
+        unique(strings);
+        expect(strings).toStrictEqual(["Krishna", "Krishna", "Hare", "Hare"]);
+    });
+});
+describe("tests for the range function", () => {
+    it("returns iterable object", () => {
+        let i = 1;
+        for(let num of range(1,10)) {
+            expect(num).toStrictEqual(i++);
+        }
+        for(let num of range(1,-3)) {
+            throw new Error("unexpected iteration");
+        }
+
+    })
+});
+describe("tests for the createIterable function", () => {
+    it("iterates all values", () => {
+        let array = [
+            "a",
+            "b",
+            "c",
+            "d",
+            "e",
+            1,
+            2,
+            3,
+            4,
+            "f",
+            null,
+            undefined,
+            function() {},
+            Symbol("id")
+        ]
+        let iterable = createIterable(...array);
+        let i = 0;
+        for(let value of iterable) {
+            expect(value).toStrictEqual(array[i++]);
+        }
+        expect(i).toBe(array.length);
+    });
+    it("does not iterate empty object", () => {
+        let empty = createIterable();
+        for(let value of empty) {
+            expect(value).toBe(0);
+            throw new Error("unexpected iteration");
+        }
+    })
+});
+describe("tests for the makeIterable function", () => {
+    it("makes the object iterable", () => {
+        let obj = {a:1, c: "d"};
+        let iterableObj = makeIterable(obj);
+        let keys = Object.keys(obj);
+        let index = 0;
+        for(let value of iterableObj) {
+            expect(value).toStrictEqual(obj[keys[index++]]);
+        }
+        expect(index).toBe(2);
+    });
+    it("does not work with the empty obj", () => {
+        let empty = {};
+        let emptyObj = makeIterable(empty);
+        for(let value of emptyObj) {
+            throw new Error("unexpected iteration");
+        }
+    })
+});
+describe("tests for the iterableFrom function" ,() => {
+    it("returns new array from iterable", () => {
+        let iterable = "String";
+        let array = iterableFrom(iterable);
+        expect(array).toStrictEqual(["S","t","r","i","n","g"]);
+        expect(Array.from(iterable)).toStrictEqual(array);
+    })
+
+});
+describe("tests for the iterableFromWithMap function", () => {
+    it("returns new array from iterable and calls map func for every element", () => {
+        let array = [1,2,3,4,5];
+        let result = iterablFromWithMap(array, (el) => el **2);
+        expect(result).toStrictEqual([1,4,9,16,25]);
     })
 })
 

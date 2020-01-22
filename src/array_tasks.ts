@@ -79,3 +79,122 @@ const getRandomInt = (min, max) => {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
+export const unique = (arr) => {
+    let newObj = {};
+    for(let i = 0; i < arr.length; i++) {
+        newObj[arr[i]] = i;
+    }
+    return Object.keys(newObj);
+}
+
+export const range = (from, to) =>  {
+    let iterable = {
+        from: from,
+        to: to,
+        [Symbol.iterator]: function() {
+            this.current =  this.from;
+            this.last = this.to;
+            return this;
+        },
+        next() {
+            if(this.current <= this.last) {
+                return {done:false, value: this.current++}
+            } else {
+                return {done: true, value: undefined}
+            }
+        }
+    };
+    return iterable;
+}
+export function createIterable(...elements) {
+    let iterable = {
+        [Symbol.iterator]: function() {
+            let count = 0;
+            return {
+                next: () => {
+                    if(count < this.length) {
+                        return {done:false, value: this[count++]}
+                    } else {
+                        return {done: true, value: undefined}
+                    }
+
+                }
+            }
+        },
+        length:0
+    };
+    for(let i = 0; i < elements.length; i++) {
+        iterable[i] = elements[i];
+        iterable.length++;
+    }
+    return iterable;
+}
+export const makeIterable = (obj) => {
+    obj[Symbol.iterator] = function() {
+        let index = 0;
+        let arrayOfValues = Object.values(this);
+        return {
+            next: () => {
+                if(index < arrayOfValues.length) {
+                    return {done:false, value: arrayOfValues[index++]};
+                } else {
+                    return {done:true, value: undefined};
+                }
+            }
+        }
+    }
+    return obj;
+};
+
+export const iterableFrom = (iterable) => {
+    let iterator = iterable[Symbol.iterator]();
+    let result = iterator.next();
+    let newArr = [];
+    if(result.done == false) {
+        newArr.push(result.value);
+    }
+    while(result.done == false) {
+       result = iterator.next();
+       if(result.done == false) {
+           newArr.push(result.value);
+       }
+    }
+    return newArr;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+1) get an iterator from the iterable object
+2) get all of the elements from the iterator,
+call mapFunc for each one of them and then,
+ push them in the new array
+3) return newArr;
+iterable = [1,2,3,4,5]
+mapFunc = (el) => el**2;
+// result -> [1,4,9,16,25];
+ */
+export const iterablFromWithMap = (iterable, mapFunc) => {
+    let iterator = iterable[Symbol.iterator](); // iterator{ next(): {done: Boolean, value: any}}
+    let nextResult = iterator.next(); // next == {done: false, value: 1}
+    let newArr = [];
+    while(nextResult.done == false) {
+        newArr.push(mapFunc(nextResult.value));
+        nextResult = iterator.next();
+    }
+    return newArr
+}
+
