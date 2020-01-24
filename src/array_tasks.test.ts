@@ -1,5 +1,5 @@
 import {getMaxSubSum, filterRangeInPlace, Calculator, shuffle,unique,range,createIterable,
-    makeIterable, iterableFrom,iterablFromWithMap} from "./array_tasks"
+    makeIterable, iterableFrom,iterablFromWithMap, aclean} from "./array_tasks"
 describe("tests for the getMaxSubSum function", () => {
     it("returns the max sum in the sub array", () => {
         expect(getMaxSubSum([-1, 2, 3, -9])).toBe(5);
@@ -175,4 +175,27 @@ describe("tests for the iterableFromWithMap function", () => {
         expect(result).toStrictEqual([1,4,9,16,25]);
     })
 })
+
+describe("aclean", function() {
+    const intersection = (arr1, arr2) => {
+        return arr1.filter(item => arr2.includes(item));
+    }
+
+    it("returns exactly 1 word from each anagram set", function() {
+        let arr = ["nap", "teachers", "cheaters", "PAN", "ear", "era", "hectares"];
+
+        let result = aclean(arr);
+        expect(result.length).toBe(3);
+
+        expect(intersection(result, ["nap", "PAN"]).length).toBe(1);
+        expect(intersection(result, ["teachers", "cheaters", "hectares"]).length).toBe(1);
+        expect(intersection(result, ["ear", "era"]).length).toBe(1);
+
+    });
+
+    it("is case-insensitive", function() {
+        let arr = ["era", "EAR"];
+        expect(aclean(arr).length).toBe(1);
+    });
+});
 

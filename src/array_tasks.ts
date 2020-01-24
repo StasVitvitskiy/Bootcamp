@@ -197,4 +197,15 @@ export const iterablFromWithMap = (iterable, mapFunc) => {
     }
     return newArr
 }
-
+export const aclean = (arr) => {
+    let map = new Map;
+    for(let i = 0; i < arr.length; i++) {
+        let sum = 0;
+        let word = arr[i].toLowerCase();
+        for(let j = 0; j < word.length; j++) {
+            sum += word.charCodeAt(j);
+        }
+        map.set(sum, arr[i]);
+    }
+    return Array.from(map.values());
+}
