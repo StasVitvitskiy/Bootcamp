@@ -46,16 +46,39 @@ export class HashTable {
 
     }
     has(key) {
+        const bucket = this.findBucket(key);
+        if(bucket == undefined) {
+            return false;
+        }
+        const entry = this.findEntry(key, bucket);
+        if(entry == undefined) {
+            return false;
+        }
+        return true;
 
     }
     remove(key) {
+        const bucket = this.findBucket(key);
+        if(bucket != undefined) {
+            bucket[1] =  bucket[1].filter((el) => {
+                return el[0] != key;
+            })
+        }
 
     }
     getKeys() {
-
+        return this.buckets.reduce((acc, cur) => {
+            return acc.concat(cur[1].map((el) => {
+                return el[0];
+            }))
+        }, [])
     }
     getValues() {
-
+        return this.buckets.reduce((acc, cur) => {
+            return acc.concat(cur[1].map((el) => {
+                return el[1];
+            }))
+        }, [])
     }
     findBucket(key) {
         const hash = this.hash(key);

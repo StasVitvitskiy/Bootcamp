@@ -73,5 +73,89 @@ describe("tests for the hash function", () => {
         ht.set("eno", 20);
         ht.set("one", 1000);
         expect(ht.get("one")).toBe(1000);
+    });
+    it("returns false when there is no bucket", () => {
+        let ht = new HashTable();
+        ht.set("one", 1);
+        ht.set("eno", 20);
+        ht.set("one", 1000);
+        expect(ht.has("someKey")).toBe(false);
+    });
+    it("returns false when there is no such key", () => {
+        let ht = new HashTable();
+        ht.set("one", 1);
+        ht.set("eno", 20);
+        ht.set("one", 1000);
+        expect(ht.has("eon")).toBe(false);
     })
+    it("returns true when the key is found", () => {
+        let ht = new HashTable();
+        ht.set("one", 1);
+        ht.set("eno", 20);
+        ht.set("one", 1000);
+        expect(ht.has("one")).toBe(true);
+    })
+    it("does not delete anything when there is no bucket", () => {
+        let ht = new HashTable();
+        ht.set("one", 1);
+        ht.set("eno", 20);
+        ht.set("one", 1000);
+        ht.remove("key");
+        expect(ht.buckets).toStrictEqual([
+            [
+                322, [
+                    ["one", 1000],
+                    ["eno", 20]
+                ]
+            ]
+        ]);
+    });
+    it("deletes nothing when the key is not found", () => {
+        let ht = new HashTable();
+        ht.set("one", 1);
+        ht.set("eno", 20);
+        ht.set("one", 1000);
+        ht.remove("eon");
+        expect(ht.buckets).toStrictEqual([
+            [
+                322, [
+                ["one", 1000],
+                ["eno", 20]
+            ]
+            ]
+        ]);
+    });
+    it("deletes the value", () => {
+        let ht = new HashTable();
+        ht.set("one", 1);
+        ht.set("eno", 20);
+        ht.set("one", 1000);
+        ht.remove("one");
+        expect(ht.buckets).toStrictEqual([
+            [
+                322, [
+                ["eno", 20]
+            ]
+            ]
+        ]);
+    });
+    it("returns array of keys", () => {
+        let ht = new HashTable();
+        ht.set("one", 1);
+        ht.set("eno", 20);
+        ht.set("one", 1000);
+        ht.set("some", 200);
+        ht.set("key", 150);
+        expect(ht.getKeys()).toStrictEqual(["one", "eno", "some", "key"]);
+    });
+    it("returns array of values", () => {
+        let ht = new HashTable();
+        ht.set("one", 1);
+        ht.set("eno", 20);
+        ht.set("one", 1000);
+        ht.set("some", 200);
+        ht.set("key", 150);
+        expect(ht.getValues()).toStrictEqual([1000, 20, 200, 150]);
+    })
+
 });
