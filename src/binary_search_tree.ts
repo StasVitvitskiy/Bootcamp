@@ -6,6 +6,36 @@ export class Tree {
             this.root = new Node(rootValue);
         }
     }
+    inOrderTraversal(callback) {
+        if(this.root == null) {
+            return;
+        }
+        this.root.inOrderTraversal(callback);
+    }
+    preOrderTraversal(callback) {
+        if(this.root == null) {
+            return;
+        }
+        this.root.preOrderTraversal(callback);
+    }
+    postOrderTraversal(callback) {
+        if(this.root == null) {
+            return;
+        }
+        this.root.postOrderTraversal(callback);
+    }
+    findMin() {
+        if(this.root == null) {
+            return undefined;
+        }
+        return this.root.getLeftmostChild().value;
+    }
+    findMax() {
+        if(this.root == null) {
+            return undefined;
+        }
+        return this.root.getRightmostChild().value;
+    }
     remove(value) {
         if(this.root == null) {
             return false;
@@ -35,21 +65,19 @@ export class Tree {
         }
         if(foundNode.right == null) {
             foundNode.value = foundNode.left.value;
-            foundNode.left = foundNode.left.left;
             foundNode.right = foundNode.left.right;
+            foundNode.left = foundNode.left.left;
             return true;
         }
-        if(foundNode.left != null && foundNode.right != null) {
-            let leftmostChild = foundNode.right.getLeftmostChild();
-            foundNode.value = leftmostChild.value;
-            let leftmostChildParent = foundNode.right.findParent(leftmostChild.value)
-            if(leftmostChildParent == null) {
-                foundNode.right = null;
-            } else {
-                leftmostChildParent.left = leftmostChild.right;
-            }
-            return true;
+        let leftmostChild = foundNode.right.getLeftmostChild();
+        foundNode.value = leftmostChild.value;
+        let leftmostChildParent = foundNode.right.findParent(leftmostChild.value)
+        if(leftmostChildParent == null) {
+            foundNode.right = null;
+        } else {
+            leftmostChildParent.left = leftmostChild.right;
         }
+        return true;
     }
     contains(value) {
         if(this.root == null) {
@@ -90,10 +118,44 @@ export class Node {
     }
     left = null;
     right = null;
+    inOrderTraversal(callback) {
+        if(this.left != null) {
+            this.left.inOrderTraversal(callback);
+        }
+        callback(this.value);
+        if(this.right != null) {
+            this.right.inOrderTraversal(callback);
+        }
+    }
+    preOrderTraversal(callback) {
+        callback(this.value);
+        if(this.left != null) {
+            this.left.preOrderTraversal(callback);
+        }
+        if(this.right != null) {
+            this.right.preOrderTraversal(callback);
+        }
+    }
+    postOrderTraversal(callback) {
+        if(this.left != null) {
+            this.left.postOrderTraversal(callback);
+        }
+        if(this.right != null) {
+            this.right.postOrderTraversal(callback);
+        }
+        callback(this.value);
+    }
     getLeftmostChild() {
         let container = this;
         while(container.left != null) {
             container = container.left;
+        }
+        return container;
+    }
+    getRightmostChild() {
+        let container = this;
+        while(container.right != null) {
+            container = container.right;
         }
         return container;
     }

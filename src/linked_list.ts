@@ -48,7 +48,7 @@ export const insert = (list, value) => {
     return list;
 }
 /*
-1) сделать клон текущего head(const newNode = new Node(head.value, head.next)) - это клон всего списка
+1) сделать клон/копия текущего head(const newNode = new Node(head.value, head.next)) - это клон всего списка
 2) поместить в head (начало списка) новое value; head.value = value;
 3) в поле головы next поместить весь оставшийся список (head.next = newNode) и вернуть его
 */

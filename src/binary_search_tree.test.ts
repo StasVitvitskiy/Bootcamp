@@ -1,7 +1,6 @@
 import {Tree, Node} from "./binary_search_tree"
-import {values} from "~/object_methods";
 describe("tests for the Tree class" ,() => {
-    const defaultLeaves = [18, 12,24, 9, 14,21,27, 7, 10, 13, 15, 20, 23, 25, 8, 26];
+    const defaultLeaves = [18, 12,24, 9, 14,21,27, 7, 10, 13, 15, 20, 23, 25, 8, 11, 26];
     const buildTree = (elements = defaultLeaves) => {
         return elements.reduce((acc, cur) => {
            acc.insert(cur);
@@ -41,6 +40,10 @@ describe("tests for the Tree class" ,() => {
         tree.insert(10);
         expect(tree.contains(90)).toBe(false);
     });
+    it("returns false if the tree is empty", () => {
+        let emptyTree = new Tree;
+        expect(emptyTree.contains(90)).toBe(false);
+    })
     it("returns false when the value is not found", () => {
         let tree = new Tree(25);
         tree.insert(21);
@@ -57,7 +60,13 @@ describe("tests for the Tree class" ,() => {
         let tree = buildTree();
         expect(tree.remove(20)).toBe(true);
         expect(tree.toArray().filter(Boolean)).toStrictEqual([
-            18,12,24,9,14,21,27,7,10,13,15,23,25,8,26
+            18,12,24,9,14,21,27,7,10,13,15,23,25,8,11,26
+        ]);
+
+        let tree1 = buildTree();
+        tree1.remove(26);
+        expect(tree1.toArray().filter(Boolean)).toStrictEqual([
+            18,12,24,9,14,21,27,7,10,13,15,20,23,25,8,11
         ]);
 
         let onlyRootTree = new Tree(3);
@@ -68,16 +77,100 @@ describe("tests for the Tree class" ,() => {
         let tree = buildTree();
         expect(tree.remove(25)).toBe(true);
         expect(tree.toArray().filter(Boolean)).toStrictEqual([
-            18,12,24,9,14,21,27,7,10,13,15,20,23,26,8
+            18,12,24,9,14,21,27,7,10,13,15,20,23,26,8,11
         ]);
-        let
+
+        let tree1 = buildTree();
+        tree1.remove(7);
+        expect(tree1.toArray().filter(Boolean)).toStrictEqual([
+            18,12,24,9,14,21,27,8,10,13,15,20,23,25,11,26
+        ]);
+
+        let tree2 = buildTree();
+        tree2.remove(21);
+        tree2.remove(23);
+        expect(tree2.toArray().filter(Boolean)).toStrictEqual([
+            18,12,24,9,14,20,27,7,10,13,15,25,8,11,26
+        ]);
+
     });
-    it("removes the node", () => {
+    it("removes the node with 2 children", () => {
         let tree = buildTree();
         tree.remove(21);
         expect(tree.toArray().filter(Boolean)).toStrictEqual([
-            18,12,24,9,14,23,27,7,10,13,15,20,25,8,26
+            18,12,24,9,14,23,27,7,10,13,15,20,25,8,11,26
         ]);
+
+        let tree1 = buildTree();
+        tree1.remove(12);
+        expect(tree1.toArray().filter(Boolean)).toStrictEqual([
+            18,13,24,9,14,21,27,7,10,15,20,23,25,8,11,26
+        ]);
+
+        let tree2 = buildTree();
+        tree2.remove(18);
+        expect(tree2.toArray().filter(Boolean)).toStrictEqual([
+            20,12,24,9,14,21,27,7,10,13,15,23,25,8,11,26
+        ]);
+    })
+    it("return the min value", () => {
+        let tree = buildTree();
+        expect(tree.findMin()).toBe(7);
+    });
+    it("returns the max value", () => {
+        let tree = buildTree();
+        expect(tree.findMax()).toBe(27);
+    })
+    it("returns undefined when the tree is empty", () => {
+        let emptyTree = new Tree;
+        expect(emptyTree.findMin()).toBe(undefined);
+        expect(emptyTree.findMax()).toBe(undefined);
+    })
+    it("traverses a tree in ascending order", () => {
+        let tree = buildTree();
+        let array = [7,8,9,10,11,12,13,14,15,18,20,21,23,24,25,26,27];
+        let i = 0;
+        tree.inOrderTraversal((nodeValue) => {
+            expect(nodeValue).toBe(array[i]);
+            i++;
+        })
+    });
+    it("does not traverse an empty tree", () => {
+        let emptyTree = new Tree;
+        emptyTree.inOrderTraversal((nodeValue) => {
+            throw new Error();
+        })
+    });
+    it("traverses a tree in pre order", () => {
+        let tree = buildTree();
+        let array = [18,12,9,7,8,10,11,14,13,15,24,21,20,23,27,25,26];
+        let i = 0;
+        tree.preOrderTraversal((nodeValue) => {
+            expect(nodeValue).toBe(array[i]);
+            i++;
+        })
+    });
+    it("does not traverse an empty tree", () => {
+        let emptyTree = new Tree;
+        emptyTree.preOrderTraversal((nodeValue) => {
+            throw new Error();
+        })
+    });
+
+    it("traverses a tree in post order", () => {
+        let tree = buildTree();
+        let array = [8,7,11,10,9,13,15,14,12,20,23,21,26,25,27,24,18];
+        let i = 0;
+        tree.postOrderTraversal((nodeValue) => {
+            expect(nodeValue).toBe(array[i]);
+            i++;
+        })
+    });
+    it("does not traverse an empty tree", () => {
+        let emptyTree = new Tree;
+        emptyTree.postOrderTraversal((nodeValue) => {
+            throw new Error();
+        })
     })
 });
 
@@ -128,4 +221,4 @@ describe("tests for the Node class", () => {
         node.insert(30);
         expect(node.getLeftmostChild()).toStrictEqual(node);
     });
-})
+});
