@@ -1,4 +1,5 @@
-import {sumTo, recurSum, formulaSum,factorialRecur,factorialLoop,fibonachi,fibonachiLoop,traverseList} from "./recursive_tasks"
+import {sumTo, recurSum, formulaSum,factorialRecur,factorialLoop,fibonachi,fibonachiLoop,traverseList,
+    traverseListInReverseRecur} from "./recursive_tasks"
 describe("tests for the recursive_tasks functions", () => {
     it("returns the sum of all the numbers in the arithmetic sequence(a sequence of numbers which differ from each other by a common difference) using looping", () => {
         expect(sumTo(4)).toBe(10);
@@ -42,5 +43,25 @@ describe("tests for the traverseList function", () => {
             return sum += element;
         })
         expect(sum).toBe(10);
+    });
+    it("traverses the list backwards recursively", () => {
+        let list = {
+            value: 1,
+            next: {
+                value: 2,
+                next: {
+                    value: 3,
+                    next: {
+                        value: 4,
+                        next: null
+                    }
+                }
+            }
+        };
+        let result = [];
+        traverseListInReverseRecur(list, (element) => {
+            result.push(element);
+        });
+        expect(result).toStrictEqual([4,3,2,1]);
     })
 })

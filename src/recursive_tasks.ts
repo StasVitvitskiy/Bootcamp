@@ -75,6 +75,12 @@ export const traverseList = (list, callback) => {
         list = list.next;
     }
 }
+export const traverseListInReverseRecur = (list, callback) => {
+    if(list.next) {
+        traverseListInReverseRecur(list.next,callback);
+    }
+    callback(list.value);
+}
 
 /* console.log(traverseList(list, (element) => {
  console.log(element);
