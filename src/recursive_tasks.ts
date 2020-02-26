@@ -82,6 +82,49 @@ export const traverseListInReverseRecur = (list, callback) => {
     callback(list.value);
 }
 
+function sum(num) {
+    function func(num1) {
+        func.result = func.result + num1;
+        return func;
+    }
+    func.result = num;
+    func.valueOf = function() {
+        return func.result;
+    }
+    return func;
+}
+//console.log(sum(1)(2));
+/* console.log(sum(1)(2)(3)(2)(4)(3)(5)(8)(9)) */
+//console.log(sum(1)(2)(3)(2)(4)(3)(5)(8)(9) == 37);
+
+/*function printNumbers(from, to) {
+    let i = from;
+    let timerId = setInterval(()=> {
+        console.log(i++);
+        if(i == to + 1) {
+            clearInterval(timerId);
+        }
+    }, 1000);
+}
+printNumbers(1, 10);
+
+function recursivePrint(from, to) {
+    let i = from;
+    setTimeout(function run() {
+        console.log(i++);
+        if(i <= to) {
+            setTimeout(run, 1000);
+        }
+    },1000)
+}
+recursivePrint(1,10);
+let i = 1;
+setTimeout(function run() {
+    console.log(i++);
+    if(i <= 10) {
+        setTimeout(run, 100);
+    }
+}, 100);
 /* console.log(traverseList(list, (element) => {
  console.log(element);
  })); */
